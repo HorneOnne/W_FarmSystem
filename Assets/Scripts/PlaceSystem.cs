@@ -1,19 +1,19 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Mathematics;
 using UnityEngine;
 
 public class PlaceSystem : MonoBehaviour
 {
     public static PlaceSystem Instance { get; private set; }
+    public event System.Action<PlacedObject> OnObjectPlaced; 
+    public event System.Action<PlacedObject> OnPlacedObjectMove;
+    public event System.Action<PlacedObject> OnMouseDownPlacedObject;
+
     [SerializeField] private LayerMask _groundLayer;
     [SerializeField] private float _maxRayDistance = 100f;
     public PlacedObject _currentPlaceObject;
     private Camera _mainCam;
-
-
-    private Vector3Int _lastestPlacedObjectIntPosition;
 
     #region Properties
     public PlacedObject CurrentPlaceObject { get => _currentPlaceObject; }
@@ -38,53 +38,24 @@ public class PlaceSystem : MonoBehaviour
     }
 
 
-
-    private void OnDisable()
-    {
-        Debug.Log("Disable");
-    }
-
-
     private void Update()
     {
-        // if (Input.GetKeyDown(KeyCode.N))
-        // {
-        //     var placeObjectPrefab = Resources.Load<PlacedObject>("PlacedObject");
-        //     if (placeObjectPrefab != null)
-        //     {
-        //         Debug.Log("A");
-        //         if (GetTargetMousePosition(out Vector3 point))
-        //         {
-        //             Instantiate(placeObjectPrefab, point, quaternion.identity);
-        //         }
-        //     }
-        //     else
-        //     {
-        //         Debug.Log("C");
-        //     }
-        // }
-
-
-
         if (_currentPlaceObject != null)
         {
             if (GetTargetMousePosition(out Vector3 point))
             {
-                _currentPlaceObject.transform.position = point;
+                _currentPlaceObject.transform.position = point - new Vector3(_currentPlaceObject.Width / 2.0f, 0, _currentPlaceObject.Depth / 2.0f);
 
-                //if (_lastestPlacedObjectIntPosition != _currentPlaceObject.GetIntPosition())
+                if (_currentPlaceObject.LastestIntPosition != _currentPlaceObject.GetIntPosition())
                 {
-                    GridSystem.Instance.ClearGridObject(_currentPlaceObject);
-
-                    bool canPlace = GridSystem.Instance.CanPlaceObject(_currentPlaceObject);
-                    Debug.Log($"canplace: {canPlace}");
+                    _currentPlaceObject.LastestIntPosition = _currentPlaceObject.GetIntPosition();
+                     GridSystem.Instance.ClearGridObject(_currentPlaceObject);
+                      bool canPlace = GridSystem.Instance.CanPlaceObject(_currentPlaceObject);
                     if (canPlace)
                     {
                         GridSystem.Instance.SetHoverObject(_currentPlaceObject);
+                        OnPlacedObjectMove?.Invoke(_currentPlaceObject);
                     }
-
-                    _lastestPlacedObjectIntPosition = _currentPlaceObject.GetIntPosition();
-                    _currentPlaceObject.LastestIntPosition = _lastestPlacedObjectIntPosition;
                 }
             }
         }
@@ -115,6 +86,7 @@ public class PlaceSystem : MonoBehaviour
             Debug.LogError("placeObject should not null.");
         }
         this._currentPlaceObject = placeObject;
+        OnMouseDownPlacedObject?.Invoke(_currentPlaceObject);
     }
 
     public void ReleaseCurrentPlaceObject()
@@ -124,12 +96,12 @@ public class PlaceSystem : MonoBehaviour
             Debug.LogError("_currentPlaceObject should not null.");
         }
 
-        GridSystem.Instance.SetPlaceObject(_currentPlaceObject);
-          // update position
-        
-        _currentPlaceObject.transform.position = new Vector3(Mathf.FloorToInt(_currentPlaceObject.transform.position.x),
-        1, Mathf.FloorToInt(_currentPlaceObject.transform.position.z));
+        if (GridSystem.Instance.CanPlaceObject(_currentPlaceObject) == false) return;
 
+        GridSystem.Instance.SetPlaceObject(_currentPlaceObject);
+        OnObjectPlaced?.Invoke(_currentPlaceObject);
+        // update position
+        _currentPlaceObject.transform.position = _currentPlaceObject.LastestIntPosition;
 
         this._currentPlaceObject = null;
     }

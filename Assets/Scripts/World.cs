@@ -49,15 +49,11 @@ public class GridSystem : MonoBehaviour
 
   public bool CanPlaceObject(IPlaceObject obj)
   {
-    Debug.Log($"{obj.Position.x}  {obj.Position.x - obj.Width / 2f}");
-    int startX = Mathf.FloorToInt(obj.Position.x);
-    int startZ = Mathf.FloorToInt(obj.Position.z);
+    int startX = Mathf.FloorToInt(obj.Transform.position.x);
+    int startZ = Mathf.FloorToInt(obj.Transform.position.z);
     int endX = startX + obj.Width;
     int endZ = startZ + obj.Depth;
 
-
-Debug.Log($"Start: {startX} {startZ}");
-Debug.Log($"End: {endX} {endZ}");
     for (int z = startZ; z < endZ; z++)
     {
       for (int x = startX; x < endX; x++)
@@ -78,27 +74,27 @@ Debug.Log($"End: {endX} {endZ}");
 
 public void SetHoverObject(IPlaceObject obj)
 {
-  int startX = Mathf.FloorToInt(obj.Position.x);
-    int startZ = Mathf.FloorToInt(obj.Position.z);
+  int startX = Mathf.FloorToInt(obj.Transform.position.x);
+    int startZ = Mathf.FloorToInt(obj.Transform.position.z);
     int endX = startX + obj.Width;
     int endZ = startZ + obj.Depth;
 
-    int count = 0;
+    int index = 0;
     for (int z = startZ; z < endZ; z++)
     {
       for (int x = startX; x < endX; x++)
       {
         _placedMask[x + z * Width] |= ObjectPlaceState.Hover;
-        obj.OccupiedIndices[count] = x + z * Width;
-        count++;
+        obj.OccupiedIndices[index] = x + z * Width;
+        index++;
       }
     }
 }
 
   public void SetPlaceObject(IPlaceObject obj)
   {
-    int startX = Mathf.FloorToInt(obj.Position.x);
-    int startZ = Mathf.FloorToInt(obj.Position.z);
+    int startX = Mathf.FloorToInt(obj.Transform.position.x);
+    int startZ = Mathf.FloorToInt(obj.Transform.position.z);
     int endX = startX + obj.Width;
     int endZ = startZ + obj.Depth;
 
@@ -124,10 +120,9 @@ public void SetHoverObject(IPlaceObject obj)
 
   public void ClearGridObject(IPlaceObject obj)
   {
-    // return;
     for (int i = 0; i < obj.OccupiedIndices.Length; i++)
     {
-      if (obj.OccupiedIndices[i] == -1) continue;
+      if (obj.OccupiedIndices[i] == -1) return;
       _placedMask[obj.OccupiedIndices[i]] &= ~ObjectPlaceState.Hover;
       _placedMask[obj.OccupiedIndices[i]] &= ~ObjectPlaceState.Occupied;
       obj.OccupiedIndices[i] = -1;
@@ -151,15 +146,20 @@ public void SetHoverObject(IPlaceObject obj)
     {
       for (int x = 0; x < Width; x++)
       {
-        if ((_placedMask[x + z * Width] & ObjectPlaceState.Hover) == ObjectPlaceState.Hover)
+        if ((_placedMask[x + z * Width] & ObjectPlaceState.Occupied) == ObjectPlaceState.Occupied)
+        {
+          Gizmos.color = Color.red;
+          Gizmos.DrawCube(new Vector3(x, 0, z) + offset, new Vector3(1,0,1));
+        }
+        else if ((_placedMask[x + z * Width] & ObjectPlaceState.Hover) == ObjectPlaceState.Hover)
         {
           Gizmos.color = Color.green;
-          Gizmos.DrawCube(new Vector3(x, 0, z) + offset, Vector3.one);
+          Gizmos.DrawCube(new Vector3(x, 0, z) + offset, new Vector3(1,0,1));
         }
-        else
+        else 
         {
           Gizmos.color = Color.white;
-          Gizmos.DrawWireCube(new Vector3(x, 0, z) + offset, Vector3.one);
+          Gizmos.DrawWireCube(new Vector3(x, 0, z) + offset, new Vector3(1,0,1));
         }
 
       }
