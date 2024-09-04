@@ -72,19 +72,19 @@ public class PlaceSystem : MonoBehaviour
             {
                 _currentPlaceObject.transform.position = point;
 
-                if (_lastestPlacedObjectIntPosition != _currentPlaceObject.GetIntPosition())
+                //if (_lastestPlacedObjectIntPosition != _currentPlaceObject.GetIntPosition())
                 {
-                    GridSystem.Instance.ClearGridAt(_currentPlaceObject);
+                    GridSystem.Instance.ClearGridHoverObject(_currentPlaceObject);
 
                     bool canPlace = GridSystem.Instance.CanPlaceObject(_currentPlaceObject);
                     Debug.Log($"canplace: {canPlace}");
                     if (canPlace)
                     {
-                        GridSystem.Instance.SetPlaceObject(_currentPlaceObject);
+                        GridSystem.Instance.SetHoverObject(_currentPlaceObject);
                     }
 
                     _lastestPlacedObjectIntPosition = _currentPlaceObject.GetIntPosition();
-                    _currentPlaceObject.LastestPosition = _lastestPlacedObjectIntPosition;
+                    _currentPlaceObject.LastestIntPosition = _lastestPlacedObjectIntPosition;
                 }
             }
         }
@@ -110,14 +110,35 @@ public class PlaceSystem : MonoBehaviour
 
     public void SetCurrentPlaceObject(PlacedObject placeObject)
     {
+        if (placeObject == null)
+        {
+            Debug.LogError("placeObject should not null.");
+        }
         this._currentPlaceObject = placeObject;
+    }
+
+    public void ReleaseCurrentPlaceObject()
+    {
+        if (this._currentPlaceObject == null)
+        {
+            Debug.LogError("_currentPlaceObject should not null.");
+        }
+
+        GridSystem.Instance.SetPlaceObject(_currentPlaceObject);
+          // update position
+        
+        _currentPlaceObject.transform.position = new Vector3(Mathf.RoundToInt(_currentPlaceObject.transform.position.x),
+        1, Mathf.RoundToInt(_currentPlaceObject.transform.position.z));
+
+
+        this._currentPlaceObject = null;
     }
 }
 
 [System.Flags]
 public enum ObjectPlaceState
 {
-    Empty = 0,
-    Occupied = 1,
-    Hover = 2,
+    Empty = 1 << 0,
+    Occupied = 1 << 1,
+    Hover = 1 << 2,
 }

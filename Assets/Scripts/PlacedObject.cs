@@ -7,7 +7,7 @@ using UnityEngine.Events;
 public class PlacedObject : MonoBehaviour, IPlaceObject
 {
     public Vector3 Position { get; set; }
-    public Vector3Int LastestPosition{get;set;}
+    public Vector3Int LastestIntPosition{get;set;}
     [field: SerializeField] public int Width { get; set; }
     [field: SerializeField] public int Depth { get; set; }
      public int[] OccupiedIndices {get;set;}
@@ -30,7 +30,7 @@ public class PlacedObject : MonoBehaviour, IPlaceObject
     public Vector3Int GetIntPosition()
     {
         return new Vector3Int(Mathf.FloorToInt(transform.position.x),
-                              Mathf.FloorToInt(transform.position.y),
+                              Mathf.FloorToInt(1),
                               Mathf.FloorToInt(transform.position.z));
     }
 
@@ -46,6 +46,6 @@ public class PlacedObject : MonoBehaviour, IPlaceObject
     private void OnMouseUp()
     {
         if(PlaceSystem.Instance.CurrentPlaceObject == this)
-            PlaceSystem.Instance.SetCurrentPlaceObject(null);
+            PlaceSystem.Instance.ReleaseCurrentPlaceObject();
     }
 }

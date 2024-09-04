@@ -46,41 +46,18 @@ public class GridSystem : MonoBehaviour
 
 
 
-  // public bool CanPlaceObject(IPlaceObject obj)
-  // {
-  //   bool IsValid(int x, int z)
-  //   {
-  //     return !(x < 0 || x >= Width || z < 0 || z >= Depth);
-  //   }
-
-  //   int startX = Mathf.FloorToInt(obj.Position.x);
-  //   int startZ = Mathf.FloorToInt(obj.Position.z);
-  //   int endX = startX + obj.Width;
-  //   int endZ = startZ + obj.Depth;
-
-  //   for (int z = startZ; z < endZ; z++)
-  //   {
-  //     for (int x = startX; x < endX; x++)
-  //     {
-  //       if (IsValid(x, z) == false)
-  //       {
-  //         return false;
-  //       }
-
-  //       if (_placedMask[x + z * Width])
-  //         return false;
-  //     }
-  //   }
-  //   return true;
-  // }
 
   public bool CanPlaceObject(IPlaceObject obj)
   {
-    int startX = Mathf.RoundToInt(obj.Position.x - obj.Width / 2f);
-    int startZ = Mathf.RoundToInt(obj.Position.z - obj.Depth / 2f);
+    Debug.Log($"{obj.Position.x}  {obj.Position.x - obj.Width / 2f}");
+    int startX = Mathf.RoundToInt(obj.Position.x - obj.Width / 2f + 0.1f);
+    int startZ = Mathf.RoundToInt(obj.Position.z - obj.Depth / 2f + 0.1f);
     int endX = startX + obj.Width;
     int endZ = startZ + obj.Depth;
 
+
+Debug.Log($"Start: {startX} {startZ}");
+Debug.Log($"End: {endX} {endZ}");
     for (int z = startZ; z < endZ; z++)
     {
       for (int x = startX; x < endX; x++)
@@ -97,26 +74,31 @@ public class GridSystem : MonoBehaviour
     }
     return true;
   }
-  // public void SetPlaceObject(IPlaceObject obj)
-  // {
-  //   int startX = Mathf.FloorToInt(obj.Position.x);
-  //   int startZ = Mathf.FloorToInt(obj.Position.z);
-  //   int endX = startX + obj.Width;
-  //   int endZ = startZ + obj.Depth;
+ 
 
-  //   for (int z = startZ; z < endZ; z++)
-  //   {
-  //     for (int x = startX; x < endX; x++)
-  //     {
-  //       _placedMask[x + z * Width] = true;
-  //     }
-  //   }
-  // }
+public void SetHoverObject(IPlaceObject obj)
+{
+  int startX = Mathf.RoundToInt(obj.Position.x - obj.Width / 2f + 0.1f);
+    int startZ = Mathf.RoundToInt(obj.Position.z - obj.Depth / 2f + 0.1f);
+    int endX = startX + obj.Width;
+    int endZ = startZ + obj.Depth;
+
+    int count = 0;
+    for (int z = startZ; z < endZ; z++)
+    {
+      for (int x = startX; x < endX; x++)
+      {
+        _placedMask[x + z * Width] |= ObjectPlaceState.Hover;
+        obj.OccupiedIndices[count] = x + z * Width;
+        count++;
+      }
+    }
+}
 
   public void SetPlaceObject(IPlaceObject obj)
   {
-    int startX = Mathf.RoundToInt(obj.Position.x - obj.Width / 2f);
-    int startZ = Mathf.RoundToInt(obj.Position.z - obj.Depth / 2f);
+    int startX = Mathf.RoundToInt(obj.Position.x - obj.Width / 2f + .1f);
+    int startZ = Mathf.RoundToInt(obj.Position.z - obj.Depth / 2f + .1f);
     int endX = startX + obj.Width;
     int endZ = startZ + obj.Depth;
 
@@ -140,13 +122,13 @@ public class GridSystem : MonoBehaviour
     }
   }
 
-  public void ClearGridAt(IPlaceObject obj)
+  public void ClearGridHoverObject(IPlaceObject obj)
   {
     // return;
     for (int i = 0; i < obj.OccupiedIndices.Length; i++)
     {
       if (obj.OccupiedIndices[i] == -1) continue;
-      _placedMask[obj.OccupiedIndices[i]] &= ~ObjectPlaceState.Occupied;
+      _placedMask[obj.OccupiedIndices[i]] &= ~ObjectPlaceState.Hover;
       obj.OccupiedIndices[i] = -1;
     }
   }
@@ -168,7 +150,7 @@ public class GridSystem : MonoBehaviour
     {
       for (int x = 0; x < Width; x++)
       {
-        if ((_placedMask[x + z * Width] & ObjectPlaceState.Occupied) == ObjectPlaceState.Occupied)
+        if ((_placedMask[x + z * Width] & ObjectPlaceState.Hover) == ObjectPlaceState.Hover)
         {
           Gizmos.color = Color.green;
           Gizmos.DrawCube(new Vector3(x, 0, z) + offset, Vector3.one);
