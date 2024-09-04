@@ -50,8 +50,8 @@ public class GridSystem : MonoBehaviour
   public bool CanPlaceObject(IPlaceObject obj)
   {
     Debug.Log($"{obj.Position.x}  {obj.Position.x - obj.Width / 2f}");
-    int startX = Mathf.RoundToInt(obj.Position.x - obj.Width / 2f + 0.1f);
-    int startZ = Mathf.RoundToInt(obj.Position.z - obj.Depth / 2f + 0.1f);
+    int startX = Mathf.FloorToInt(obj.Position.x);
+    int startZ = Mathf.FloorToInt(obj.Position.z);
     int endX = startX + obj.Width;
     int endZ = startZ + obj.Depth;
 
@@ -78,8 +78,8 @@ Debug.Log($"End: {endX} {endZ}");
 
 public void SetHoverObject(IPlaceObject obj)
 {
-  int startX = Mathf.RoundToInt(obj.Position.x - obj.Width / 2f + 0.1f);
-    int startZ = Mathf.RoundToInt(obj.Position.z - obj.Depth / 2f + 0.1f);
+  int startX = Mathf.FloorToInt(obj.Position.x);
+    int startZ = Mathf.FloorToInt(obj.Position.z);
     int endX = startX + obj.Width;
     int endZ = startZ + obj.Depth;
 
@@ -97,8 +97,8 @@ public void SetHoverObject(IPlaceObject obj)
 
   public void SetPlaceObject(IPlaceObject obj)
   {
-    int startX = Mathf.RoundToInt(obj.Position.x - obj.Width / 2f + .1f);
-    int startZ = Mathf.RoundToInt(obj.Position.z - obj.Depth / 2f + .1f);
+    int startX = Mathf.FloorToInt(obj.Position.x);
+    int startZ = Mathf.FloorToInt(obj.Position.z);
     int endX = startX + obj.Width;
     int endZ = startZ + obj.Depth;
 
@@ -122,13 +122,14 @@ public void SetHoverObject(IPlaceObject obj)
     }
   }
 
-  public void ClearGridHoverObject(IPlaceObject obj)
+  public void ClearGridObject(IPlaceObject obj)
   {
     // return;
     for (int i = 0; i < obj.OccupiedIndices.Length; i++)
     {
       if (obj.OccupiedIndices[i] == -1) continue;
       _placedMask[obj.OccupiedIndices[i]] &= ~ObjectPlaceState.Hover;
+      _placedMask[obj.OccupiedIndices[i]] &= ~ObjectPlaceState.Occupied;
       obj.OccupiedIndices[i] = -1;
     }
   }

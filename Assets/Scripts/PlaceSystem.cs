@@ -74,7 +74,7 @@ public class PlaceSystem : MonoBehaviour
 
                 //if (_lastestPlacedObjectIntPosition != _currentPlaceObject.GetIntPosition())
                 {
-                    GridSystem.Instance.ClearGridHoverObject(_currentPlaceObject);
+                    GridSystem.Instance.ClearGridObject(_currentPlaceObject);
 
                     bool canPlace = GridSystem.Instance.CanPlaceObject(_currentPlaceObject);
                     Debug.Log($"canplace: {canPlace}");
@@ -127,8 +127,8 @@ public class PlaceSystem : MonoBehaviour
         GridSystem.Instance.SetPlaceObject(_currentPlaceObject);
           // update position
         
-        _currentPlaceObject.transform.position = new Vector3(Mathf.RoundToInt(_currentPlaceObject.transform.position.x),
-        1, Mathf.RoundToInt(_currentPlaceObject.transform.position.z));
+        _currentPlaceObject.transform.position = new Vector3(Mathf.FloorToInt(_currentPlaceObject.transform.position.x),
+        1, Mathf.FloorToInt(_currentPlaceObject.transform.position.z));
 
 
         this._currentPlaceObject = null;
