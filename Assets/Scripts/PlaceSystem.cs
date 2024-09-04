@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlaceSystem : MonoBehaviour
+public class PlaceObjectSystem : MonoBehaviour
 {
-    public static PlaceSystem Instance { get; private set; }
+    public static PlaceObjectSystem Instance { get; private set; }
     public event System.Action<PlacedObject> OnObjectPlaced; 
     public event System.Action<PlacedObject> OnPlacedObjectMove;
     public event System.Action<PlacedObject> OnMouseDownPlacedObject;

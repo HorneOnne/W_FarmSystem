@@ -29,22 +29,22 @@ public class PlacedObject : MonoBehaviour, IPlaceObject
     public Vector3Int GetIntPosition()
     {
         return new Vector3Int(Mathf.FloorToInt(transform.position.x),
-                              Mathf.FloorToInt(1),
+                              Mathf.FloorToInt(0),
                               Mathf.FloorToInt(transform.position.z));
     }
 
    
     private void OnMouseDown()
     {
-        if(PlaceSystem.Instance.CurrentPlaceObject == null)
-            PlaceSystem.Instance.SetCurrentPlaceObject(this);
+        if(PlaceObjectSystem.Instance.CurrentPlaceObject == null)
+            PlaceObjectSystem.Instance.SetCurrentPlaceObject(this);
 
 
     }
 
     private void OnMouseUp()
     {
-        if(PlaceSystem.Instance.CurrentPlaceObject == this)
-            PlaceSystem.Instance.ReleaseCurrentPlaceObject();
+        if(PlaceObjectSystem.Instance.CurrentPlaceObject == this)
+            PlaceObjectSystem.Instance.ReleaseCurrentPlaceObject();
     }
 }
