@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,13 +7,31 @@ public class RotateObjectSystem : MonoBehaviour
 {
     public static event System.Action<ObjectRotation> OnRotateToLeft;
     public static event System.Action<ObjectRotation> OnRotateToRight;
-   public ObjectRotation ObjectRot;
+    public ObjectRotation ObjectRot;
     private bool _isDragging;
-   private Vector3 _previousMousePosition;
+    private Vector3 _previousMousePosition;
+
+
+    private void OnEnable()
+    {
+        PlaceObjectSystem.Instance.OnObjectPlaced += OnObjectPlacedEventTriggered;
+    }
+
+
+
+    private void OnDisable()
+    {
+        PlaceObjectSystem.Instance.OnObjectPlaced -= OnObjectPlacedEventTriggered;
+    }
 
     private void Update()
     {
-         // Start dragging
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            ReleaseRotatedObject();
+        }
+
+        // Start dragging
         if (Input.GetMouseButtonDown(0) && ObjectRot != null) // 0 is the left mouse button
         {
             _previousMousePosition = Input.mousePosition;
@@ -30,7 +49,7 @@ public class RotateObjectSystem : MonoBehaviour
             {
                 if (dragDelta.x > 0)
                 {
-                      ObjectRot.RotateToRight();
+                    ObjectRot.RotateToRight();
                     OnRotateToRight?.Invoke(ObjectRot);
                 }
                 else if (dragDelta.x < 0)
@@ -51,13 +70,18 @@ public class RotateObjectSystem : MonoBehaviour
         }
     }
 
-   public void SetRotatedObject(ObjectRotation objectRotation)
-   {
+    public void SetRotatedObject(ObjectRotation objectRotation)
+    {
         this.ObjectRot = objectRotation;
-   }
+    }
 
-   public void ReleaseRotatedObject()
-   {
+    public void ReleaseRotatedObject()
+    {
         this.ObjectRot = null;
-   }
+    }
+
+    private void OnObjectPlacedEventTriggered(PlacedObject obj)
+    {
+        SetRotatedObject(obj.GetComponent<ObjectRotation>());
+    }
 }

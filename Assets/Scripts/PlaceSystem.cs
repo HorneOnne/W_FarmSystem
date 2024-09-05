@@ -1,12 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlaceObjectSystem : MonoBehaviour
 {
     public static PlaceObjectSystem Instance { get; private set; }
-    public event System.Action<PlacedObject> OnObjectPlaced; 
+    public event System.Action<PlacedObject> OnObjectPlaced;
     public event System.Action<PlacedObject> OnPlacedObjectMove;
     public event System.Action<PlacedObject> OnMouseDownPlacedObject;
 
@@ -42,15 +43,15 @@ public class PlaceObjectSystem : MonoBehaviour
     {
         if (_currentPlaceObject != null)
         {
-            if (GetTargetMousePosition(out Vector3 point))
+            bool hitOnPlane = GetTargetMousePosition(out Vector3 point);
+             _currentPlaceObject.transform.position = point - new Vector3(_currentPlaceObject.Width / 2.0f, 0, _currentPlaceObject.Depth / 2.0f);
+            if (hitOnPlane)
             {
-                _currentPlaceObject.transform.position = point - new Vector3(_currentPlaceObject.Width / 2.0f, 0, _currentPlaceObject.Depth / 2.0f);
-
                 if (_currentPlaceObject.LastestIntPosition != _currentPlaceObject.GetIntPosition())
                 {
                     _currentPlaceObject.LastestIntPosition = _currentPlaceObject.GetIntPosition();
-                     GridSystem.Instance.ClearGridObject(_currentPlaceObject);
-                      bool canPlace = GridSystem.Instance.CanPlaceObject(_currentPlaceObject);
+                    GridSystem.Instance.ClearGridObject(_currentPlaceObject);
+                    bool canPlace = GridSystem.Instance.CanPlaceObject(_currentPlaceObject);
                     if (canPlace)
                     {
                         GridSystem.Instance.SetHoverObject(_currentPlaceObject);
@@ -74,7 +75,8 @@ public class PlaceObjectSystem : MonoBehaviour
         }
         else
         {
-            point = default;
+            // get point hit based on mouse and look direction
+            point = Camera.main.transform.position + ray.direction * _maxRayDistance;
             return false;
         }
     }
@@ -102,7 +104,6 @@ public class PlaceObjectSystem : MonoBehaviour
         OnObjectPlaced?.Invoke(_currentPlaceObject);
         // update position
         _currentPlaceObject.transform.position = _currentPlaceObject.LastestIntPosition;
-
         this._currentPlaceObject = null;
     }
 }
