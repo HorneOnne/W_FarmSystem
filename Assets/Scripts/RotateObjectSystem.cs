@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class RotateObjectSystem : MonoBehaviour
 {
+    public static RotateObjectSystem Instance{get; private set;}
     public static event System.Action<ObjectRotation> OnRotateToLeft;
     public static event System.Action<ObjectRotation> OnRotateToRight;
     public ObjectRotation ObjectRot;
@@ -12,16 +13,21 @@ public class RotateObjectSystem : MonoBehaviour
     private Vector3 _previousMousePosition;
 
 
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     private void OnEnable()
     {
-        PlaceObjectSystem.Instance.OnObjectPlaced += OnObjectPlacedEventTriggered;
+        // PlaceObjectSystem.Instance.OnObjectPlaced += OnObjectPlacedEventTriggered;
     }
 
 
 
     private void OnDisable()
     {
-        PlaceObjectSystem.Instance.OnObjectPlaced -= OnObjectPlacedEventTriggered;
+        // PlaceObjectSystem.Instance.OnObjectPlaced -= OnObjectPlacedEventTriggered;
     }
 
     private void Update()

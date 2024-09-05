@@ -9,21 +9,19 @@ public class PlaceObjectSystem : MonoBehaviour
     public static PlaceObjectSystem Instance { get; private set; }
     public event System.Action<PlacedObject> OnObjectPlaced;
     public event System.Action<PlacedObject> OnPlacedObjectMove;
-    public event System.Action<PlacedObject> OnMouseDownPlacedObject;
 
     [SerializeField] private LayerMask _groundLayer;
     [SerializeField] private float _maxRayDistance = 100f;
-    public PlacedObject _currentPlaceObject;
+    //  public PlacedObject _currentPlaceObject;
     private Camera _mainCam;
-
+    private bool _isDragging;
     #region Properties
-    public PlacedObject CurrentPlaceObject { get => _currentPlaceObject; }
+    // public PlacedObject CurrentPlaceObject { get => _currentPlaceObject; }
+    [field: SerializeField] public bool CanDrag { get; set; } = false;
 
     #endregion
 
 
-    // Test
-    public Transform HitObjectTesting;
 
     private void Awake()
     {
@@ -41,25 +39,78 @@ public class PlaceObjectSystem : MonoBehaviour
 
     private void Update()
     {
-        if (_currentPlaceObject != null)
+        if (ObjectInteractionManager.Instance.CanInteract == false) return;
+        if (ObjectInteractionManager.Instance.CanMove == false) return;
+        // Start dragging
+        if (Input.GetMouseButtonDown(0)) // 0 is the left mouse button
         {
+            if (Input.GetMouseButtonDown(0))
+            {
+                Ray ray = _mainCam.ScreenPointToRay(Input.mousePosition);
+
+                if (Physics.Raycast(ray, out RaycastHit hit, _maxRayDistance))
+                {
+                    if (hit.collider.TryGetComponent<PlacedObject>(out var hitObj))
+                    {
+                        if (hitObj == ObjectInteractionManager.Instance.InteractiveObject)
+                        {
+                            //Debug.Log("same");
+                            _isDragging = true;
+                            var currentPlaceObject = ObjectInteractionManager.Instance.InteractiveObject;
+                            bool hitOnPlane = GetTargetMousePosition(out Vector3 point);
+                            currentPlaceObject.transform.position = point - new Vector3(currentPlaceObject.Size.x / 2.0f, 0, currentPlaceObject.Size.y / 2.0f);
+                            if (hitOnPlane)
+                            {
+                                currentPlaceObject.LastestIntPosition = currentPlaceObject.GetIntPosition();
+                                GridSystem.Instance.ClearGridObject(currentPlaceObject);
+                                bool canPlace = GridSystem.Instance.CanPlaceObject(currentPlaceObject);
+                                if (canPlace)
+                                {
+                                    GridSystem.Instance.SetHoverObject(currentPlaceObject);
+                                    OnPlacedObjectMove?.Invoke(currentPlaceObject);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            //Debug.Log("not same");
+                        }
+                    }
+                }
+            }
+
+
+        }
+
+        // Dragging
+        if (Input.GetMouseButton(0) && _isDragging)
+        {
+            var currentPlaceObject = ObjectInteractionManager.Instance.InteractiveObject;
             bool hitOnPlane = GetTargetMousePosition(out Vector3 point);
-             _currentPlaceObject.transform.position = point - new Vector3(_currentPlaceObject.Size.x / 2.0f, 0, _currentPlaceObject.Size.y / 2.0f);
+            currentPlaceObject.transform.position = point - new Vector3(currentPlaceObject.Size.x / 2.0f, 0, currentPlaceObject.Size.y / 2.0f);
             if (hitOnPlane)
             {
-                if (_currentPlaceObject.LastestIntPosition != _currentPlaceObject.GetIntPosition())
+                if (currentPlaceObject.LastestIntPosition != currentPlaceObject.GetIntPosition())
                 {
-                    _currentPlaceObject.LastestIntPosition = _currentPlaceObject.GetIntPosition();
-                    GridSystem.Instance.ClearGridObject(_currentPlaceObject);
-                    bool canPlace = GridSystem.Instance.CanPlaceObject(_currentPlaceObject);
+                    currentPlaceObject.LastestIntPosition = currentPlaceObject.GetIntPosition();
+                    GridSystem.Instance.ClearGridObject(currentPlaceObject);
+                    bool canPlace = GridSystem.Instance.CanPlaceObject(currentPlaceObject);
                     if (canPlace)
                     {
-                        GridSystem.Instance.SetHoverObject(_currentPlaceObject);
-                        OnPlacedObjectMove?.Invoke(_currentPlaceObject);
+                        GridSystem.Instance.SetHoverObject(currentPlaceObject);
+                        OnPlacedObjectMove?.Invoke(currentPlaceObject);
                     }
                 }
             }
         }
+
+        // End dragging
+        if (Input.GetMouseButtonUp(0) && _isDragging)
+        {
+            _isDragging = false; // Reset dragging state
+            ReleaseCurrentPlaceObject();
+        }
+
     }
 
 
@@ -81,30 +132,19 @@ public class PlaceObjectSystem : MonoBehaviour
         }
     }
 
-    public void SetCurrentPlaceObject(PlacedObject placeObject)
-    {
-        if (placeObject == null)
-        {
-            Debug.LogError("placeObject should not null.");
-        }
-        this._currentPlaceObject = placeObject;
-        OnMouseDownPlacedObject?.Invoke(_currentPlaceObject);
-    }
 
     public void ReleaseCurrentPlaceObject()
     {
-        if (this._currentPlaceObject == null)
+        Debug.Log("release");
+        var currentPlaceObject = ObjectInteractionManager.Instance.InteractiveObject;
+        if (GridSystem.Instance.CanPlaceObject(currentPlaceObject))
         {
-            Debug.LogError("_currentPlaceObject should not null.");
+            GridSystem.Instance.SetPlaceObject(currentPlaceObject);
+            OnObjectPlaced?.Invoke(currentPlaceObject);
+            // update position
+            currentPlaceObject.transform.position = currentPlaceObject.LastestIntPosition;
         }
 
-        if (GridSystem.Instance.CanPlaceObject(_currentPlaceObject) == false) return;
-
-        GridSystem.Instance.SetPlaceObject(_currentPlaceObject);
-        OnObjectPlaced?.Invoke(_currentPlaceObject);
-        // update position
-        _currentPlaceObject.transform.position = _currentPlaceObject.LastestIntPosition;
-        this._currentPlaceObject = null;
     }
 }
 
