@@ -7,8 +7,9 @@ public class PlacedObject : MonoBehaviour, IPlaceObject
 {
     public Transform Transform { get; set; }
     public Vector3Int LastestIntPosition{get;set;}
-    [field: SerializeField] public int Width { get; set; }
-    [field: SerializeField] public int Depth { get; set; }
+
+    [field: SerializeField] public Vector2Int Size { get; set; }
+
      public int[] OccupiedIndices {get;set;}
 
 
@@ -20,7 +21,7 @@ public class PlacedObject : MonoBehaviour, IPlaceObject
         this._boxCollider = GetComponent<BoxCollider>();
         _boxCollider.center = new Vector3(0.5f, 0.5f, 0.5f);
         this.Transform = this.transform;
-        OccupiedIndices = new int[Width * Depth];
+        OccupiedIndices = new int[Size.x * Size.y];
         for(int i = 0; i < OccupiedIndices.Length; i++)
             OccupiedIndices[i] = -1;
     }
@@ -29,7 +30,7 @@ public class PlacedObject : MonoBehaviour, IPlaceObject
     public Vector3Int GetIntPosition()
     {
         return new Vector3Int(Mathf.FloorToInt(transform.position.x),
-                              Mathf.FloorToInt(0),
+                              Mathf.FloorToInt(transform.position.y + 0.01f),
                               Mathf.FloorToInt(transform.position.z));
     }
 

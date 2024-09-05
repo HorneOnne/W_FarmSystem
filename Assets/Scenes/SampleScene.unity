@@ -140,6 +140,16 @@ PrefabInstance:
       propertyPath: <Width>k__BackingField
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4550594964659581320, guid: 8dc4bef54ab6e4b82886bae9079a47be,
+        type: 3}
+      propertyPath: <Size>k__BackingField.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4550594964659581320, guid: 8dc4bef54ab6e4b82886bae9079a47be,
+        type: 3}
+      propertyPath: <Size>k__BackingField.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4662415879365347105, guid: 8dc4bef54ab6e4b82886bae9079a47be,
         type: 3}
       propertyPath: m_Name
@@ -701,6 +711,16 @@ PrefabInstance:
       propertyPath: <Depth>k__BackingField
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4550594964659581320, guid: 8dc4bef54ab6e4b82886bae9079a47be,
+        type: 3}
+      propertyPath: <Size>k__BackingField.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4550594964659581320, guid: 8dc4bef54ab6e4b82886bae9079a47be,
+        type: 3}
+      propertyPath: <Size>k__BackingField.y
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4662415879365347105, guid: 8dc4bef54ab6e4b82886bae9079a47be,
         type: 3}
       propertyPath: m_Name
@@ -844,8 +864,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d441cfed10da9434bac72adb4c4161f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Origin: {x: -5, y: 0, z: 5}
-  Width: 10
+  Origin: {x: 0, y: 2, z: 0}
+  Width: 15
   Depth: 10
   _visualizeMesh: {fileID: 623083431}
   _showGizmos: 1

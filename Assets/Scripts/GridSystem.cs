@@ -48,8 +48,8 @@ public class GridSystem : MonoBehaviour
   {
     int startX = Mathf.FloorToInt(obj.Transform.position.x) - Origin.x;
     int startZ = Mathf.FloorToInt(obj.Transform.position.z) - Origin.z;
-    int endX = startX + obj.Width;
-    int endZ = startZ + obj.Depth;
+    int endX = startX + obj.Size.x;
+    int endZ = startZ + obj.Size.y;
 
     for (int z = startZ; z < endZ; z++)
     {
@@ -73,8 +73,8 @@ public void SetHoverObject(IPlaceObject obj)
 {
   int startX = Mathf.FloorToInt(obj.Transform.position.x) - Origin.x;
     int startZ = Mathf.FloorToInt(obj.Transform.position.z) - Origin.z;
-    int endX = startX + obj.Width;
-    int endZ = startZ + obj.Depth;
+    int endX = startX + obj.Size.x;
+    int endZ = startZ + obj.Size.y;
 
     int index = 0;
     for (int z = startZ; z < endZ; z++)
@@ -92,8 +92,8 @@ public void SetHoverObject(IPlaceObject obj)
   {
     int startX = Mathf.FloorToInt(obj.Transform.position.x) - Origin.x;
     int startZ = Mathf.FloorToInt(obj.Transform.position.z) - Origin.z;
-    int endX = startX + obj.Width;
-    int endZ = startZ + obj.Depth;
+    int endX = startX + obj.Size.x;
+    int endZ = startZ + obj.Size.y;
 
     int count = 0;
     for (int z = startZ; z < endZ; z++)

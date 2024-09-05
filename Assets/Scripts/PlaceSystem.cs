@@ -44,7 +44,7 @@ public class PlaceObjectSystem : MonoBehaviour
         if (_currentPlaceObject != null)
         {
             bool hitOnPlane = GetTargetMousePosition(out Vector3 point);
-             _currentPlaceObject.transform.position = point - new Vector3(_currentPlaceObject.Width / 2.0f, 0, _currentPlaceObject.Depth / 2.0f);
+             _currentPlaceObject.transform.position = point - new Vector3(_currentPlaceObject.Size.x / 2.0f, 0, _currentPlaceObject.Size.y / 2.0f);
             if (hitOnPlane)
             {
                 if (_currentPlaceObject.LastestIntPosition != _currentPlaceObject.GetIntPosition())
