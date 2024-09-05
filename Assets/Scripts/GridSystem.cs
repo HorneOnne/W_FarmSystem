@@ -1,17 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GridSystem : MonoBehaviour
 {
   public static GridSystem Instance { get; private set; }
 
+  public Vector3Int Origin;
   public int Width = 10;
   public int Depth = 10;
 
   private ObjectPlaceState[] _placedMask;
-
-
+  [SerializeField] private Transform _visualizeMesh;
 
   // editor
   [SerializeField] private bool _showGizmos = true;
@@ -31,26 +32,22 @@ public class GridSystem : MonoBehaviour
     {
       _placedMask[i] |= ObjectPlaceState.Empty;
     }
+
+    // update grid position
+    transform.position = Origin;
+
+    // update visual
+    Vector3 position = new Vector3(Width / 2.0f, 0f, Depth / 2.0f);
+    Vector3 scale = new Vector3(Width, Depth, 1);
+    _visualizeMesh.localPosition = position;
+    _visualizeMesh.localScale = scale;
   }
-
-  private void Start()
-  {
-
-  }
-
-
-  private void Update()
-  {
-
-  }
-
-
 
 
   public bool CanPlaceObject(IPlaceObject obj)
   {
-    int startX = Mathf.FloorToInt(obj.Transform.position.x);
-    int startZ = Mathf.FloorToInt(obj.Transform.position.z);
+    int startX = Mathf.FloorToInt(obj.Transform.position.x) - Origin.x;
+    int startZ = Mathf.FloorToInt(obj.Transform.position.z) - Origin.z;
     int endX = startX + obj.Width;
     int endZ = startZ + obj.Depth;
 
@@ -74,8 +71,8 @@ public class GridSystem : MonoBehaviour
 
 public void SetHoverObject(IPlaceObject obj)
 {
-  int startX = Mathf.FloorToInt(obj.Transform.position.x);
-    int startZ = Mathf.FloorToInt(obj.Transform.position.z);
+  int startX = Mathf.FloorToInt(obj.Transform.position.x) - Origin.x;
+    int startZ = Mathf.FloorToInt(obj.Transform.position.z) - Origin.z;
     int endX = startX + obj.Width;
     int endZ = startZ + obj.Depth;
 
@@ -93,8 +90,8 @@ public void SetHoverObject(IPlaceObject obj)
 
   public void SetPlaceObject(IPlaceObject obj)
   {
-    int startX = Mathf.FloorToInt(obj.Transform.position.x);
-    int startZ = Mathf.FloorToInt(obj.Transform.position.z);
+    int startX = Mathf.FloorToInt(obj.Transform.position.x) - Origin.x;
+    int startZ = Mathf.FloorToInt(obj.Transform.position.z) - Origin.z;
     int endX = startX + obj.Width;
     int endZ = startZ + obj.Depth;
 
@@ -141,7 +138,7 @@ public void SetHoverObject(IPlaceObject obj)
     if (_placedMask == null || _placedMask.Length != Width * Depth) return;
 
 
-    Vector3 offset = new Vector3(0.5f, 0.5f, 0.5f);
+    Vector3 offset = new Vector3(0.5f, 0.5f, 0.5f) + Origin;
     for (int z = 0; z < Depth; z++)
     {
       for (int x = 0; x < Width; x++)
